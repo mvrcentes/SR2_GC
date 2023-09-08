@@ -1,26 +1,34 @@
 #pragma once
-#include "color.h"
+#include <glm/glm.hpp>
 #include "uniform.h"
 #include "fragment.h"
-#include "glm/glm.hpp"
-#include <cmath>
-#include <random>
 
+#include "print.h"
 
-Vertex vertexShader(const Vertex& vertex, const Uniform& u) {
+Vertex vertexShader(const Vertex& vertex, const Uniforms& uniforms) {
+    // Apply transformations to the input vertex using the matrices from the uniforms
+    glm::vec4 clipSpaceVertex = uniforms.projection * uniforms.view * uniforms.model * glm::vec4(vertex.position, 1.0f);
 
-    glm::vec4 v = glm::vec4(vertex.position.x, vertex.position.y, vertex.position.z, 1);
+    // Perspective divide
+    glm::vec3 ndcVertex = glm::vec3(clipSpaceVertex) / clipSpaceVertex.w;
 
+    // Apply the viewport transform
+    glm::vec4 screenVertex = uniforms.viewport * glm::vec4(ndcVertex, 1.0f);
+    
+    // Transform the normal
+    glm::vec3 transformedNormal = glm::mat3(uniforms.model) * vertex.normal;
+    transformedNormal = glm::normalize(transformedNormal);
 
-    glm::vec4 r = u.viewport * u.projection * u.view * u.model * v;
-
-
+    // Return the transformed vertex as a vec3
     return Vertex{
-            glm::vec3(r.x/r.w, r.y/r.w, r.z/r.w),
-            vertex.color
+        glm::vec3(screenVertex),
+        transformedNormal,
+        // vertex.normal, // non transformed normal
     };
-};
+}
 
-Fragment fragmentShader(Fragment fragment) {
-    return fragment;
-};
+Fragment fragmentShader(const Fragment& fragment) {
+    Fragment processedFragment = fragment;
+    processedFragment.color = fragment.color * (fragment.intensity * 1.2f);
+    return processedFragment;
+}

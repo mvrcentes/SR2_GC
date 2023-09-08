@@ -139,9 +139,9 @@ glm::mat4 createModelMatrix() {
 glm::mat4 createViewMatrix() {
     return glm::lookAt(
             // donde esta
-            glm::vec3(0, 0, -10),
+            glm::vec3(10, 0, -1),
             // hacia a donde va 
-            glm::vec3(0, 0, 0),
+            glm::vec3(10, 0, 0),
             // arriba
             glm::vec3(0, 1, 0)
     );
@@ -303,6 +303,7 @@ int main(int argc, char** argv) {
     SDL_Window* window = SDL_CreateWindow("life", 100, 100, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
 
     std::string filePath = "/Users/mvrcentes/Library/CloudStorage/OneDrive-UVG/Documentos/Semestre_6/Graficas_por_computadoras/SR2_GC/x.obj";
+    // std::string filePath = "/Users/mvrcentes/Downloads/quesOvni.obj";
     loadOBJ(filePath, vertices, faces);
 
     std::vector<glm::vec3> vertexArray = setupVertexArray(vertices, faces);
